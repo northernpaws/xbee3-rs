@@ -4,7 +4,11 @@ This crate provides an interface for communicating with XBee 3 devices/modules, 
 
 The base module for the crate provides all the common types and traits, and then platform support (i.e. stm32 via [Embassy](https://embassy.dev)) are provided as modules. To use the library, you should use one of the platform-specific modules to initialize an XBee device using the interfaces available for that platform (i.e. UART, Serial over USB, etc.). 
 
-## `no_std` Usage
+## Usage
+
+### `no_std` Embassy Usage
+
+The `embassy` module and associated features (i.e. `stm32`) provide transports for communicating with the XBee devices over MCU peripherals (i.e. UART), synchronized using `embassy-sync` channels.
 
 ```toml
 # Example with the stm32 platform integration.
@@ -16,3 +20,20 @@ default-features = false
 # no_std, and Embassy stm32 helpers.
 features = ["stm32"] 
 ```
+
+### 'tokio' Usage
+
+The `tokio` module provides a base transport that uses Tokio's sync modules for synchronizing API frame packet transmission and reception with `PubSubChannel`s.
+
+```toml
+# Example using Tokio for asynchronous messaging
+# and serialport for xbee serial access.
+[dependencies.xbee3-rs]
+features = ["tokio", "serialport"] 
+
+```
+
+## Examples
+
+ * `serialport` - Uses `tokio` for syncronization and `serialport` for communicating with USB serial devices.
+ * `stm32f401re` - Uses `embassy` and `embassy-sync` for communicating with an XBee radio from an embedded device.
