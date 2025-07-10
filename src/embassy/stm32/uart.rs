@@ -14,6 +14,7 @@ use embassy_stm32::usart;
 use embassy_sync;
 use embassy_sync::channel::{Channel};
 use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex;
+use embassy_sync::pubsub;
 
 use crate::buffer::PacketBuffer;
 use crate::api::frames::{Frame, ReceiveFrame};
@@ -39,7 +40,7 @@ async fn handle_send (
 
         // Build the packet from the API frame struct.
         // TODO: better error handling
-        frame.populate_frame(&mut packet_buffer).unwrap();
+        frame.encode_frame(&mut packet_buffer).unwrap();
 
         // Now write the constructed buffer using UART.
         uart_tx.write_all(packet_buffer.bytes()).await;
@@ -51,7 +52,7 @@ async fn handle_send (
 #[embassy_executor::task]
 async fn handle_recv (
     _uart_rx: usart::BufferedUartRx<'static>,
-    _channel: &'static PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
+    _channel: &'static pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
 ) {
         todo!("implement packet reception")
 }
@@ -63,9 +64,11 @@ pub enum Error {}
 /// Opens communication with an XBee device connected over UART on the STM32.
 pub fn open<'a> (
     spawner: Spawner,
-    uart: usart::BufferedUart<'static>,
-    channel_rx: &'static PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
-) -> Result<Device<ChannelTransport<'static>>, crate::embassy::Error> {
+    // Reserved block of memory to use for encoding API frames to packets.
+    send_buffer: &'a mut [u8; 65535],
+    uart: usart::BufferedUart<'a>,
+    channel_rx: &'a pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
+) -> Result<Device<ChannelTransport<'a, usart::BufferedUartTx<'a>>>, crate::embassy::Error> {
     // Split the supplied UART peripheral into two distinct RX and TX handlers.
     //
     // This enforces asycnronousy through the compiler by preventing the TX task from ever acidentally
@@ -84,7 +87,7 @@ pub fn open<'a> (
 
     // Construct an XBee transport that wraps the embassy-sync channels to
     // coordinate sending and reciving with their respective Embassy tasks.
-    let transport = ChannelTransport::new(uart_tx, channel_rx);//.sender()
+    let transport = ChannelTransport::new(uart_tx, send_buffer, channel_rx);//.sender()
 
     // Now that the transmision and reception tasks are started, we can construct and
     // return an XBee device handle that communicates with them via their channels.
