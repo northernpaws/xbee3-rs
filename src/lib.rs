@@ -62,15 +62,10 @@ mod lib {
     pub use std::io::{Write, Read, Error};
 }
 
-use core::marker::PhantomData;
-
-use lib::*;
-
 use crate::{
     api::frames::{
         Frame,
-        TransmitFrame,
-        HasResponseFrame
+        TransmitFrame
     },
     transport::Transport
 };

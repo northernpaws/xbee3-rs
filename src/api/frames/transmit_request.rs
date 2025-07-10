@@ -2,7 +2,6 @@ use crate::{
     buffer::PacketBuffer,
     error::PacketSerializationError,
     api::{
-        gen_frame_id,
         frames::{
             Frame,
             FrameKind,

@@ -5,7 +5,6 @@ use crate::{
 
     api::frames::{
         HasResponseFrame,
-        ReceiveFrame,
         TransmitFrame
     }, 
 };
@@ -24,10 +23,10 @@ pub trait Transport { // ErrorType
     /// 
     /// On some platforms this may involve placing the packet on a
     /// queue for transmission shortly after queuing.
-    fn send_frame(&self, frame: TransmitFrame) -> Self::TransmitFuture;
+    fn send_frame(&mut self, frame: TransmitFrame) -> Self::TransmitFuture;
 
-    /// Returns a future that waits for the next received API frame from the transport.
-    fn receive(&self) -> impl Future<Output = ReceiveFrame>;
+    // Returns a future that waits for the next received API frame from the transport.
+    // fn receive(&self) -> impl Future<Output = ReceiveFrame>;
 }
 
 pub struct EnqueueRespFuture<'a, T: Transport, F: HasResponseFrame> {

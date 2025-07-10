@@ -3,9 +3,12 @@ use crate::{
     // between the embedded core and standard libraries.
     lib::*,
 
+    buffer::PacketBuffer,
+
     transport::Transport,
     
     api::frames::{
+        Frame,
         ReceiveFrame,
         TransmitFrame
     },
@@ -19,11 +22,13 @@ use embassy_sync::{
 
 /// Default maxmimum number of queue unprocesses transmission messages.
 static DEFAULT_RX_CHANNEL_SIZE: usize = 64;
+static DEFAULT_TX_CHANNEL_SIZE: usize = 64;
 
 /// Alias to the embassy-sync channel type used by the transport to avoid repeating verbose code.
 type RXChannel<'a> = pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, DEFAULT_RX_CHANNEL_SIZE, 64, 64>;
 
 /// Alias to the embassy-sync channel's SendFuture type used by the transport to avoid repeating verbose code.
+type SendFuture<'a> = channel::SendFuture<'a, ThreadModeRawMutex, TransmitFrame, DEFAULT_TX_CHANNEL_SIZE>;
 // type ReceiveFuture<'a> = channel::ReceiveFuture<'a, ThreadModeRawMutex, TransmitFrame, DEFAULT_TX_CHANNEL_SIZE>;
 
 /// Alias to the embassy-sync channel's Sender type used by the transport to avoid repeating verbose code.
@@ -33,7 +38,7 @@ type RXChannel<'a> = pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, DEF
 /// the interface for communicating with the underlying MCU peripheral, typically UART.
 pub struct ChannelTransport<'a, W: Write> {
     writer: W,
-    send_buffer: PacketBuffer,
+    send_buffer: PacketBuffer<'a>,
     rx_channel: &'a RXChannel<'a>
 }
 
@@ -42,12 +47,11 @@ impl<'a, W: Write> ChannelTransport<'a, W> {
     /// embassy-sync channel for queuing transmission messages.
     pub fn new(
         writer: W,
+        // Reserved block of memory to use for encoding API frames to packets.
+        buffer: &'a mut [u8; 65535],
         rx_channel: &'a RXChannel<'a>
     ) -> Self {
-        // Reserve a block of memory to use for encoding API frames to packets,
-        // and wrap it in a packet helper that does our integer conversions.
-        let mut buffer: [u8; 65535] = [0; 65535]; // 65535 is the XBee max API packet size.
-        let mut send_buffer = PacketBuffer::new(&mut buffer);
+        let send_buffer = PacketBuffer::new(buffer);
         
         Self {
             writer,
@@ -64,23 +68,23 @@ impl<'a, W: Write> Transport for ChannelTransport<'a, W> {
     /// 
     /// Returns a future that blocks until the frame is placed in
     /// the embassy-sync transmission channel for the transport.
-    fn send_frame(&self, frame: TransmitFrame) -> SendFuture<'a> {
+    async fn send_frame(&mut self, frame: TransmitFrame) -> () {
         // Reset the buffer position pointer to start a new packet.
         self.send_buffer.reset();
 
         // Build the packet from the API frame struct.
         // TODO: better error handling
-        frame.populate_frame(&mut self.send_buffer).unwrap();
+        frame.encode_frame(&mut self.send_buffer).unwrap();
 
         // Now write the constructed buffer using UART.
-        self.writer.write_all(self.send_buffer.bytes()).await;
+        self.writer.write_all(self.send_buffer.bytes());
     }
     
-    fn receive(&self) -> impl Future<Output = crate::api::frames::ReceiveFrame> {
-        self.rx_channel.receive()
-    }    
+    // fn receive(&self) -> impl Future<Output = crate::api::frames::ReceiveFrame> {
+    //     // self.rx_channel.receive()
+    // }    
 }
 
-impl ErrorType for ChannelTransport<'_> {
+impl<'a, W: Write> ErrorType for ChannelTransport<'a, W> {
     type Error = super::Error;
 }

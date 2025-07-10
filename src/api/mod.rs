@@ -4,7 +4,9 @@ pub mod frames;
 /// Checksum calculation.
 pub mod checksum;
 
+#[cfg(feature = "std")]
 use rand;
+#[cfg(feature = "std")]
 use rand::Rng;
 
 // use downcast_rs::{impl_downcast, Downcast};
