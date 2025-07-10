@@ -715,7 +715,7 @@ pub enum APIEnable {
 pub enum APIOutputOptions {
     RxIndicator = 0, // recommended for new designs
     ExplicitRxIndicator = 1,
-    LegacyIdnicator = 2,
+    LegacyIndicator = 2,
 }
 
 pub struct ExtendedAPIOptions {
@@ -952,8 +952,9 @@ pub struct PullUpDownResistorEnable {
 }
 
 impl PullUpDownResistorEnable {
-    pub fn bitfield(&self) -> u16 {
-        let mut val: u16 = 0;
+    // TODO: is bit field math correct
+    pub fn bitfield(&self) -> u32 {
+        let mut val: u32 = 0;
 
         if self.dio4 == true {
             val |= 1 << 0;
@@ -1063,8 +1064,9 @@ pub struct PullUpDownDirection {
 }
 
 impl PullUpDownDirection {
-    pub fn bitfield(&self) -> u16 {
-        let mut val: u16 = 0;
+    // TODO: is bit field math correct
+    pub fn bitfield(&self) -> u32 {
+        let mut val: u32 = 0;
 
         if self.dio4_pull_up == true {
             val |= 1 << 0;
@@ -1499,7 +1501,7 @@ impl Commands {
             Commands::CyclicSleepWakeTime(_) => Identifier::CyclicSleepWakeTime,
             Commands::DisassociatedCyclicSleepPeriod(_) => Identifier::DisassociatedCyclicSleepPeriod,
             Commands::NumberOfSleepPeriods(_) => Identifier::NumberOfSleepPeriods,
-            Commands::SleepOptions(as_ref) => Identifier::SleepOptions,
+            Commands::SleepOptions(_) => Identifier::SleepOptions,
             Commands::ForcePoll => Identifier::ForcePoll,
             Commands::PythonStartup(_) => Identifier::PythonStartup,
             Commands::MicroPythonCommand(_) => Identifier::MicroPythonCommand,
