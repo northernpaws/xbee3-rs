@@ -1,7 +1,13 @@
 // Facade that handles imports that need to differentiate
 // between the embedded core and standard libraries.
 use crate::{
-    api::frames::{HasResponseFrame, ReceiveFrame, TransmitFrame}, lib::*
+    lib::*,
+
+    api::frames::{
+        HasResponseFrame,
+        ReceiveFrame,
+        TransmitFrame
+    }, 
 };
 
 /// The primary trait that interfaces with the underlying connection to the XBee devices.

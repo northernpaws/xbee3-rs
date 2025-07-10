@@ -43,7 +43,7 @@ impl Frame for ExtendedTransmitStatus {
         super::FrameKind::ExtendedTransmitStatus
     }
 
-    fn populate_frame_data<'a> (&self, _buffer: &mut crate::buffer::PacketBuffer<'a>) -> Result<(), crate::error::PacketSerializationError> {
+    fn encode_frame_data<'a> (&self, _buffer: &mut crate::buffer::PacketBuffer<'a>) -> Result<(), crate::error::PacketSerializationError> {
         todo!()
     }
 }

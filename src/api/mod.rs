@@ -15,6 +15,8 @@ pub(crate) static DELIMITER: u8 = 0x7E;
 /// Special transmission address that indicates a broadcast to all devices.
 pub static BROADCAST_ADDR: u64 = 0xffff;
 
+pub static COORDINATOR_ADDR: u64 = 0x000000000000000;
+
 #[cfg(feature = "std")]
 pub fn gen_frame_id() -> u8 {
     let mut rng = rand::rng();

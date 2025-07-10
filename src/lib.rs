@@ -5,7 +5,7 @@
 pub mod error;
 
 pub mod api;
-pub mod command;
+pub mod at;
 pub mod buffer;
 pub mod transport;
 
@@ -26,10 +26,15 @@ mod lib {
         pub use std::*;
     }
 
-    #[cfg(not(feature = "std"))]
-    pub use tracing::{trace, info, warn, error};
     #[cfg(feature = "std")]
+    pub use tracing::{trace, info, warn, error};
+    #[cfg(not(feature = "std"))]
     pub use defmt::{trace, info, warn, error};
+
+    
+    pub use self::core::marker::{
+        PhantomData
+    };
 
     pub use self::core::fmt::{
         self,
@@ -94,7 +99,7 @@ impl<T: Transport> Device<T> {
     /// An async Future is used to ensure that the frame has been placed on the queue for
     /// cases where the queue may be full and there is a delay, or in case such as USART
     /// where the receiving device may not be ready yet for a new message.
-    pub fn enqueue_api_frame<
+    pub fn send_frame<
         // Traits are used to ensure that we are passed a type that can be converted to an
         // transmission frame, and that the frame type is a type that can receive a response.
         F: Frame
@@ -107,23 +112,23 @@ impl<T: Transport> Device<T> {
         // on the transport side - important for embedded devices.
         TransmitFrame: From<F>
     {
-        self.transport.enqueue_api_frame(frame.into())
+        self.transport.send_frame(frame.into())
     }
 
-    /// Enqueues an API frame and waits for a response from the XBee device.
-    // TODO: remove static lifetime 
-    pub async fn enqueue_api_frame_resp<F: HasResponseFrame> (&mut self, frame: F) -> EnqueueRespFuture<'_, T, F> {
-        // Copy the frame ID so we can pass it to the Future to watch for a reply.
-        let frame_id = frame.frame_id();
+    // /// Enqueues an API frame and waits for a response from the XBee device.
+    // // TODO: remove static lifetime 
+    // pub async fn enqueue_api_frame_resp<F: HasResponseFrame> (&mut self, frame: F) -> EnqueueRespFuture<'_, T, F> {
+    //     // Copy the frame ID so we can pass it to the Future to watch for a reply.
+    //     let frame_id = frame.frame_id();
 
-        // First, enqueue the frame for d transmission with the transport.
-        self.transport.enqueue_api_frame(frame.into()).await;
+    //     // First, enqueue the frame for d transmission with the transport.
+    //     self.transport.send_frame(frame.into()).await;
 
-        // Next, wait for a reply from the XBee device.
-        EnqueueRespFuture{
-            transport: &self.transport,
-            frame_id,
-            _frame: PhantomData
-        }
-    }
+    //     // Next, wait for a reply from the XBee device.
+    //     EnqueueRespFuture{
+    //         transport: &self.transport,
+    //         frame_id,
+    //         _frame: PhantomData
+    //     }
+    // }
 }

@@ -62,7 +62,7 @@ impl<I: Write + Read> TokioTransport<I> {
 }
 
 impl<I: Write + Read> TokioTransport<I> {
-    async fn transmit (&self) {
+    async fn transmit (&mut self) {
         // Reserve a block of memory to use for encoding API frames to packets,
         // and wrap it in a packet helper that does our integer conversions.
         let mut buffer: [u8; 65535] = [0; 65535]; // 65535 is the XBee max API packet size.
@@ -78,7 +78,7 @@ impl<I: Write + Read> TokioTransport<I> {
 
             // Build the packet from the API frame struct.
             // TODO: better error handling
-            frame.populate_frame(&mut packet_buffer).unwrap();
+            frame.encode_frame(&mut packet_buffer).unwrap();
 
             // Now write the constructed frame packet from the buffer.
             self.interface.write_all(packet_buffer.bytes());
@@ -86,20 +86,54 @@ impl<I: Write + Read> TokioTransport<I> {
 
         info!("transmit channel closed");
     }
+
+    async fn receive(&self) {
+        // Reserve a block of memory to use for receiving
+        // and decoding packets to API frames.
+        let mut buffer: [u8; 65535] = [0; 65535]; // 65535 is the XBee max API packet size.
+
+        let mut reading_packet = false;
+        let mut data_length = 0;
+
+        loop {
+            // Attempt to read the next block of bytes from the port.
+            match self.interface.read(&mut buffer) {
+                Ok(length) => {
+                    // Loop over and process the received bytes.
+                    for bytes in &buffer[0..length] {
+                        if byte == api::DELIMITER {
+                            if !reading_packet {
+                                reading_packet = true;
+                            } else {
+                                error!("found new packet header when previous packet wasn't closed");
+                            }
+                        } else {
+                            if data_length == 0 {
+                                
+                            }
+                        }
+                    }
+                },
+                Err(err) => {
+                    error!("failed to read from interface: {}", err)
+                }
+            }
+        }
+    }
 }
 
 impl<I: Write + Read> Transport for TokioTransport<I> {
     type TransmitFuture = SendFuture;
 
     /// Enqueues an API frame for transmission to the XBee device.
-    fn enqueue_api_frame(&self, frame: TransmitFrame) -> SendFuture {
+    fn send_frame(&self, frame: TransmitFrame) -> SendFuture {
         SendFuture{
             channel: PollSender::new(self.transmit_tx.clone()),
             frame: Some(frame)
         }
     }
     
-    async fn receive(&self) -> ReceiveFrame {
+    async fn receive(&self) -> () {
         
     }
 }

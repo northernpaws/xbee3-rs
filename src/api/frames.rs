@@ -23,16 +23,16 @@ pub trait Frame {
     fn kind(&self) -> FrameKind;
 
     /// Populates the supplied buffer with the frame data in bytes [5..n] of the packet.
-    fn populate_frame_data<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<(), PacketSerializationError>;
+    fn encode_frame_data<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<(), PacketSerializationError>;
 
-    fn populate_frame<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<usize, PacketSerializationError> {
+    fn encode_frame<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<usize, PacketSerializationError> {
         // Add the delimiter that marks the start of an API packet.
         buffer.put_u8(crate::api::DELIMITER);
 
         // Put a placeholder for the frame data length.
         buffer.put_u16(0);
 
-        self.populate_frame_data(buffer)?;
+        self.encode_frame_data(buffer)?;
 
         // Update the frame data length now that we know it.
         let size = (buffer.size as u16 - 3).to_be_bytes();
@@ -93,10 +93,10 @@ impl Frame for TransmitFrame {
         }
     }
     
-    fn populate_frame_data<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<(), PacketSerializationError> {
+    fn encode_frame_data<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<(), PacketSerializationError> {
         // Encode the frame data depending on the frame type.
         match &self {
-            Self::TransmitRequest(frame) => frame.populate_frame_data(buffer)
+            Self::TransmitRequest(frame) => frame.encode_frame_data(buffer)
         }
     }
 }
