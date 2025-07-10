@@ -51,4 +51,4 @@ embedded-io = "0.6.1"
 [dependencies.xbee3-rs]
 path = "../../"
 default-features = false
-features = ["stm32"]
+features = ["stm32f401re"]

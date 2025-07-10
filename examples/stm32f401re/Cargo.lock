@@ -762,7 +762,7 @@ dependencies = [
  "embassy-time",
  "embedded-io",
  "panic-probe",
- "xbee-rs",
+ "xbee3-rs",
 ]
 
 [[package]]
@@ -836,7 +836,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "xbee-rs"
+name = "xbee3-rs"
 version = "0.1.0"
 dependencies = [
  "cortex-m",
