@@ -9,7 +9,8 @@ default = ["std"]
 std = [
     "derive_more/std",
     "dep:tracing",
-    "rand"
+    "rand",
+    "futures/std"
 ]
 
 defmt = [
@@ -48,6 +49,7 @@ stm32f401re = [
 [dependencies]
 
 strum_macros = { version = "0.27.1" }
+futures = { version = "0.3", default-features = false }
 
 # Desktop/Software packages
 tracing = { version = "0.1.41", optional = true }

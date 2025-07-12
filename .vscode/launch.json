@@ -1,0 +1,53 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "STM32F4104 Example",
+            "cwd": "${workspaceFolder}/examples/stm32f401re",
+            "connectUnderReset": true,
+            "chip": "STM32F401RETx",
+            "flashingConfig": {
+                "flashingEnabled": true,
+                "haltAfterReset": true
+            },
+            "coreConfigs": [
+                {
+                    "coreIndex": 0,
+                    "programBinary": "./target/thumbv7em-none-eabi/debug/stm32f401re",
+                    "svdFile": "${command:device-manager.getDevicePack}",
+                    "rttEnabled": true,
+                    "rttChannelFormats": [
+                        {
+                            "channelNumber": 0,
+                            // Format RTT data as String data
+                            "dataFormat": "String",
+                            // Include host-side timestamps for every line of data transferred from the target RTT output
+                            "showTimestamps": true
+                        },
+                        {
+                            "channelNumber": 1,
+                            // Treat data as raw binary data, and do not format in any way
+                            "dataFormat": "BinaryLE"
+                        }
+                    ]
+                }
+            ],
+
+            "preLaunchTask": "example_stm32f401re",
+
+            // Peripherial Views (XPERHIPHERALS) plugin.
+            //
+            // The SVD file is automatically downloaded by the ARM Device Manager extension.
+            "svdPath": "${command:device-manager.getDevicePack}",
+            "deviceName": "${command:device-manager.getDeviceName}",
+
+            // Peripheral Inspector plugin
+            "definitionPath": "${command:device-manager.getDevicePack}"
+        }
+    ]
+}

@@ -94,11 +94,11 @@ impl<T: Transport> Device<T> {
     /// An async Future is used to ensure that the frame has been placed on the queue for
     /// cases where the queue may be full and there is a delay, or in case such as USART
     /// where the receiving device may not be ready yet for a new message.
-    pub fn send_frame<
+    pub async fn send_frame<
         // Traits are used to ensure that we are passed a type that can be converted to an
         // transmission frame, and that the frame type is a type that can receive a response.
         F: Frame
-    > (&mut self, frame: F) -> T::TransmitFuture
+    > (&mut self, frame: F) -> Result<(), T::SendError>
     where
         // Ensures that the passed frame type is a tranmissable frame.
         //
@@ -107,7 +107,7 @@ impl<T: Transport> Device<T> {
         // on the transport side - important for embedded devices.
         TransmitFrame: From<F>
     {
-        self.transport.send_frame(frame.into())
+        self.transport.send_frame(frame.into()).await
     }
 
     // /// Enqueues an API frame and waits for a response from the XBee device.

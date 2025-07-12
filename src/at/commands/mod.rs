@@ -562,7 +562,7 @@ pub struct ScanChannels {
 
     // NOTE: avoid when possible, output power capped on PRO variants.
     channel_26: bool, // 0x1A - 2.480
-}
+} // TODO: bitmask
 
 pub enum TransmitOptions {}
 

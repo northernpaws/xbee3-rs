@@ -4,7 +4,7 @@ use crate::{
     lib::*,
 
     api::frames::{
-        HasResponseFrame,
+        // HasResponseFrame,
         TransmitFrame
     }, 
 };
@@ -14,7 +14,8 @@ use crate::{
 /// This would typically be something like a UART peripheral, USB Serial
 /// connection, or even something as simple as a console for debugging.
 pub trait Transport { // ErrorType
-    type TransmitFuture: Future;
+    // type TransmitFuture: Future;
+    type SendError;
 
     /// Queues an API frame for transmission to the XBee device.
     /// 
@@ -23,28 +24,29 @@ pub trait Transport { // ErrorType
     /// 
     /// On some platforms this may involve placing the packet on a
     /// queue for transmission shortly after queuing.
-    fn send_frame(&mut self, frame: TransmitFrame) -> Self::TransmitFuture;
+    async fn send_frame(&mut self, frame: TransmitFrame) -> Result<(), Self::SendError>;
+    // fn send_frame(&mut self, frame: TransmitFrame) -> Self::TransmitFuture;
 
     // Returns a future that waits for the next received API frame from the transport.
     // fn receive(&self) -> impl Future<Output = ReceiveFrame>;
 }
 
-pub struct EnqueueRespFuture<'a, T: Transport, F: HasResponseFrame> {
-    transport: &'a T,
-    frame_id: u8,
+// pub struct EnqueueRespFuture<'a, T: Transport, F: HasResponseFrame> {
+//     transport: &'a T,
+//     frame_id: u8,
 
-    // We need a reference to the frame type to
-    // extract the response frame type from.
-    //
-    // This is part of the implicit type checking implement to ensure
-    // that the correct response frame types are used at all times.
-    _frame: PhantomData<F>
-}
+//     // We need a reference to the frame type to
+//     // extract the response frame type from.
+//     //
+//     // This is part of the implicit type checking implement to ensure
+//     // that the correct response frame types are used at all times.
+//     _frame: PhantomData<F>
+// }
 
-impl<'a, T: Transport, F: HasResponseFrame> Future for EnqueueRespFuture<'a, T, F> {
-    type Output = (); // F::ResponseFrame; // TODO:
+// impl<'a, T: Transport, F: HasResponseFrame> Future for EnqueueRespFuture<'a, T, F> {
+//     type Output = (); // F::ResponseFrame; // TODO:
 
-    fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        Poll::Ready(())
-    }
-}
+//     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+//         Poll::Ready(())
+//     }
+// }

@@ -7,11 +7,11 @@
 /// without needing to cause new allocations.
 pub struct PacketBuffer<'a> {
     pub size: usize,
-    pub data: &'a mut [u8]
+    pub data: &'a mut [u8; 65535]
 }
 
-impl<'a> From<&'a mut [u8]> for PacketBuffer<'a> {
-    fn from(value: &'a mut [u8]) -> Self {
+impl<'a> From<&'a mut [u8; 65535]> for PacketBuffer<'a> {
+    fn from(value: &'a mut [u8; 65535]) -> Self {
         Self {
             size: 0,
             data: value
@@ -20,7 +20,7 @@ impl<'a> From<&'a mut [u8]> for PacketBuffer<'a> {
 }
 
 impl<'a> PacketBuffer<'a> {
-    pub fn new(data: &'a mut [u8]) -> Self {
+    pub fn new(data: &'a mut [u8; 65535]) -> Self {
         Self{
             size: 0,
             data

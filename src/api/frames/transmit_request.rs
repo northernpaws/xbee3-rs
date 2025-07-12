@@ -163,7 +163,7 @@ mod tests {
             0x00, // options
             0x48, 0x45, 0x4C, 0x4C, 0x4F, // H E L L O
             0x7D // checksum
-        ]);
+        ]); // 7e 00 13 10 01 00 00 00 00 00 00 00 00 ff fe 00 00 48 45 4c 4c 4f 7d
 
         Ok(())
     }

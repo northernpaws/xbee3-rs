@@ -37,3 +37,10 @@ features = ["tokio", "serialport"]
 
  * `serialport` - Uses `tokio` for syncronization and `serialport` for communicating with USB serial devices.
  * `stm32f401re` - Uses `embassy` and `embassy-sync` for communicating with an XBee radio from an embedded device.
+
+
+## Troubleshooting
+
+### RTS Configuration
+
+By default the Xbee 3 modules enable CTS flow control on pin DIO7. Unless RTS on the host is connected,this appears to cause a problem where the module goes into a pseudo-sleep mode and doesn't process API packets until the hosts's RTS signal is asserted.

@@ -12,49 +12,32 @@ use derive_more::{Display, Error, From};
 use embassy_executor::{Spawner};
 use embassy_stm32::usart;
 use embassy_sync;
-use embassy_sync::channel::{Channel};
 use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex;
-use embassy_sync::pubsub;
+
+use embedded_io_async::{BufRead};
 
 use crate::buffer::PacketBuffer;
-use crate::api::frames::{Frame, ReceiveFrame};
 use crate::api::frames::TransmitFrame;
 
-/// Embassy task that listens for outgoing API frames queued over by the XBee device handle via
-/// the transmission channel, encodes them to packets, and transmits them to the XBee device.
-#[embassy_executor::task]
-async fn handle_send (
-    mut uart_tx: usart::BufferedUartTx<'static>,
-    channel: &'static Channel<ThreadModeRawMutex, TransmitFrame, 64>,
-) {
-    // Reserve a block of memory to use for encoding API frames to packets,
-    // and wrap it in a packet helper that does our integer conversions.
-    let mut buffer: [u8; 65535] = [0; 65535]; // 65535 is the XBee max API packet size.
-    let mut packet_buffer = PacketBuffer::new(&mut buffer);
-
-    loop {
-        packet_buffer.reset();
-
-        // Wait for the next packet frame from the sending channel.
-        let frame = channel.receive().await;
-
-        // Build the packet from the API frame struct.
-        // TODO: better error handling
-        frame.encode_frame(&mut packet_buffer).unwrap();
-
-        // Now write the constructed buffer using UART.
-        uart_tx.write_all(packet_buffer.bytes()).await;
-    }
-}
+pub type RXChannel = crate::embassy::channel::RXChannel;
 
 /// Embassy task that listens for incoming API frame packets received from the XBee device,
 /// and decodes them into API frame structs and emits them over the reception channel.
 #[embassy_executor::task]
 async fn handle_recv (
-    _uart_rx: usart::BufferedUartRx<'static>,
-    _channel: &'static pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
+    mut uart_rx: usart::BufferedUartRx<'static>,
+    _channel: &'static RXChannel,
 ) {
-        todo!("implement packet reception")
+    // TODO: actual implementation, here we just throw away bytes
+    trace!("starting API frame receive loop");
+    loop {
+        let buf = uart_rx.fill_buf().await.unwrap();
+        info!("Received: {}", buf);
+
+        // Read bytes have to be explicitly consumed, otherwise fill_buf() will return them again
+        let n = buf.len();
+        uart_rx.consume(n);
+    }
 }
 
 #[derive(Debug, Display, From, Error)]
@@ -65,10 +48,10 @@ pub enum Error {}
 pub fn open<'a> (
     spawner: Spawner,
     // Reserved block of memory to use for encoding API frames to packets.
-    send_buffer: &'a mut [u8; 65535],
-    uart: usart::BufferedUart<'a>,
-    channel_rx: &'a pubsub::PubSubChannel<ThreadModeRawMutex, ReceiveFrame, 64, 64, 64>,
-) -> Result<Device<ChannelTransport<'a, usart::BufferedUartTx<'a>>>, crate::embassy::Error> {
+    send_buffer: &'static mut [u8; 65535],
+    uart: usart::BufferedUart<'static>,
+    channel_rx: &'static RXChannel,
+) -> Result<Device<ChannelTransport<'static, usart::BufferedUartTx<'static>>>, crate::embassy::Error> {
     // Split the supplied UART peripheral into two distinct RX and TX handlers.
     //
     // This enforces asycnronousy through the compiler by preventing the TX task from ever acidentally

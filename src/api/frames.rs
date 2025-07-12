@@ -25,6 +25,7 @@ pub trait Frame {
     /// Populates the supplied buffer with the frame data in bytes [5..n] of the packet.
     fn encode_frame_data<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<(), PacketSerializationError>;
 
+    /// Encodes the API frame as an API packet into the provided packet buffer.
     fn encode_frame<'a> (&self, buffer: &mut PacketBuffer<'a>) -> Result<usize, PacketSerializationError> {
         // Add the delimiter that marks the start of an API packet.
         buffer.put_u8(crate::api::DELIMITER);
