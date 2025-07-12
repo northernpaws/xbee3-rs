@@ -95,9 +95,12 @@ impl<'a, W: Write + 'a> Transport for ChannelTransport<'a, W> {
         frame.encode_frame(&mut self.send_buffer)?;
 
         // Now write the constructed buffer using UART.
-        trace!("writing frame packet");
-        let bytes = self.send_buffer.bytes();
-        self.writer.write_all(bytes).await
+        trace!("writing frame packet (length={})", self.send_buffer.size);
+        self.writer.write_all(self.send_buffer.bytes()).await
+            .map_err(|e| Self::SendError::WriteError(e))?;
+
+        trace!("flushing frame packet (length={})", self.send_buffer.size);
+        self.writer.flush().await
             .map_err(|e| Self::SendError::WriteError(e))?;
 
         trace!("done!");

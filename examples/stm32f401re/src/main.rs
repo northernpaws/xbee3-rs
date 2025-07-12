@@ -32,11 +32,14 @@ bind_interrupts!(struct Irqs {
     USART1 => usart::BufferedInterruptHandler<peripherals::USART1>;
 });
 
+use embedded_io::Write;
+// use embedded_io_async::Write;
+
 // Create two static channels to use for syncronizing sending
 // and receiving messages with the STM32 UART periperal.
 static XBEE_RX_CHANNEL: xbee3_rs::embassy::stm32::uart::RXChannel = PubSubChannel::new();
 
-const BUFFER_SIZE: usize = 32; //64;
+const BUFFER_SIZE: usize = 64; //64;
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
@@ -67,22 +70,27 @@ async fn main(_spawner: Spawner) {
     let usart2_rx: &mut [u8; BUFFER_SIZE] = singleton!(RX_BUF: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE]).unwrap();
     let usart2_tx: &mut [u8; BUFFER_SIZE] = singleton!(TX_BUF: [u8; BUFFER_SIZE] = [0; BUFFER_SIZE]).unwrap();
 
+    // Set the baud rate to the XBee 3 standard rate.
+    let mut usart_config = usart::Config::default();
+    usart_config.baudrate = 9600;
+
     // Construct a new BufferedUart interface using pins PA9 and PA10 with the USART2 peripheral.
     //
     // Note that XBee3 modules in their default configuration don't play nice with serial unless
     // the RTS flow control line is connected. They seem to sometimes go into a pseudo-sleep mode
     // that requires asserting RTS to wake it.
-    let usart2 = usart::BufferedUart::new_with_rts(
+    let mut usart2 = usart::BufferedUart::new( // new_with_rts
         peripherals.USART1, 
         Irqs,
         peripherals.PA10, // (USART1_RX)
         peripherals.PA9, // (USART1_TX)
-        peripherals.PA12, // (USART1_RTS)
+        // peripherals.PA12, // (USART1_RTS)
         usart2_tx,
         usart2_rx,
-        // Use default baud rate, parity, and flow control settings.
-        usart::Config::default(),
+        usart_config,
     ).unwrap();
+
+    // usart2.write_all(b"HELLO\r\n");
 
     let send_buffer: &mut [u8; 65535] = singleton!(SEND_BUFFER: [u8; 65535] = [0; 65535]).unwrap();
 
