@@ -125,6 +125,4 @@ async fn main(_spawner: Spawner) {
         Err(err) => error!("failed to write packet!")
     }
     info!("broadcast sent!");
-
-    loop {}
 }
