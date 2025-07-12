@@ -76,21 +76,18 @@ async fn main(_spawner: Spawner) {
 
     // Construct a new BufferedUart interface using pins PA9 and PA10 with the USART2 peripheral.
     //
-    // Note that XBee3 modules in their default configuration don't play nice with serial unless
-    // the RTS flow control line is connected. They seem to sometimes go into a pseudo-sleep mode
-    // that requires asserting RTS to wake it.
-    let mut usart2 = usart::BufferedUart::new( // new_with_rts
+    // Note that XBee3 end-device modules in their default sleep configuration don't play nice with
+    // serial unless the RTS flow control line is connected. This is because they don't know to wake
+    // from sleep on serial messages without them.
+    let mut usart2 = usart::BufferedUart::new(
         peripherals.USART1, 
         Irqs,
         peripherals.PA10, // (USART1_RX)
         peripherals.PA9, // (USART1_TX)
-        // peripherals.PA12, // (USART1_RTS)
         usart2_tx,
         usart2_rx,
         usart_config,
     ).unwrap();
-
-    // usart2.write_all(b"HELLO\r\n");
 
     let send_buffer: &mut [u8; 65535] = singleton!(SEND_BUFFER: [u8; 65535] = [0; 65535]).unwrap();
 
@@ -100,8 +97,9 @@ async fn main(_spawner: Spawner) {
     let mut xb = unwrap!(xbee3_rs::embassy::stm32::uart::open(_spawner, send_buffer,
         usart2, &XBEE_RX_CHANNEL));
 
-    // TODO: change to API frame mode
-
+    // TODO: change to API frame mode if required
+    //.  write +++, wait for OK, and then `AT AP 1\r`
+    
     // Construct an API frame that broadcasts an ASCII payload on the Zigbee network.
     info!("constructing broadcast");
     let broadcast = api::frames::TransmitRequestFrame{

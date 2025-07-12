@@ -1193,6 +1193,7 @@ dependencies = [
  "embedded-io",
  "embedded-io-async",
  "futures",
+ "heapless",
  "rand",
  "strum_macros",
  "tokio",
