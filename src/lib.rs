@@ -26,12 +26,6 @@ mod lib {
         pub use std::*;
     }
 
-
-    #[cfg(feature = "std")]
-    pub use std::boxed::Box;
-    #[cfg(not(feature = "std"))]
-    pub use heapless::Box;
-
     #[cfg(feature = "std")]
     pub use tracing::{trace, info, warn, error};
     #[cfg(not(feature = "std"))]

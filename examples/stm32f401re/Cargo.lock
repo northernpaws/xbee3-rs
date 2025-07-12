@@ -904,5 +904,6 @@ dependencies = [
  "embedded-io",
  "embedded-io-async",
  "futures",
+ "heapless",
  "strum_macros",
 ]

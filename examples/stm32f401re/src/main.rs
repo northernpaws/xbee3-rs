@@ -27,6 +27,7 @@ use embassy_stm32::{
 };
 
 use xbee3_rs::api;
+use xbee3_rs::at;
 
 bind_interrupts!(struct Irqs {
     USART1 => usart::BufferedInterruptHandler<peripherals::USART1>;
@@ -123,6 +124,8 @@ async fn main(_spawner: Spawner) {
         Err(err) => error!("failed to write packet!")
     }
     info!("broadcast sent!");
+
+    at::encode_command(at::commands::ACKFailures);
 
     loop {}
 }
