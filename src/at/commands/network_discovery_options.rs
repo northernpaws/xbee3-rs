@@ -1,6 +1,12 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct NetworkDiscoveryOptions(pub NetworkDiscoveryOptions);
+use super::Identifier;
+
+pub struct NetworkDiscoveryOptions {
+    append_digi_device_dentifier: bool,
+    send_own_nd_response: bool,
+    last_hop_rssi: bool
+}
 
 impl super::Command for NetworkDiscoveryOptions {
     fn identifier(&self) -> Identifier {
@@ -10,6 +16,7 @@ impl super::Command for NetworkDiscoveryOptions {
 
 impl From<NetworkDiscoveryOptions> for Command<0> {
     fn from(cmd: NetworkDiscoveryOptions) -> Command<0> {
+        todo!();
         Command{
             identifier: Identifier::NetworkDiscoveryOptions,
             payload: None,

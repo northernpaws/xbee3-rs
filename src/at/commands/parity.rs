@@ -1,6 +1,12 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct Parity(pub Parity);
+use super::Identifier;
+
+pub enum Parity {
+    None = 0,
+    Even = 1,
+    Odd = 2
+}
 
 impl super::Command for Parity {
     fn identifier(&self) -> Identifier {

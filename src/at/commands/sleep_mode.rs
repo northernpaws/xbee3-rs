@@ -1,6 +1,14 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct SleepMode(pub SleepMode);
+use super::Identifier;
+
+pub enum SleepMode {
+    NoSleep = 0,
+    PinSleep = 1,
+    CyclicSleep = 4,
+    CyclicSleepWithPinWakeup = 5,
+    MicroPythonSleep = 6,
+}
 
 impl super::Command for SleepMode {
     fn identifier(&self) -> Identifier {

@@ -1,8 +1,12 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
+
+use super::Identifier;
 
 pub struct ConfigurationCRC;
 
 impl super::Command for ConfigurationCRC {
+    const PAYLOAD_SIZE: u8 = 0;
+
     fn identifier(&self) -> Identifier {
         Identifier::ConfigurationCRC
     }

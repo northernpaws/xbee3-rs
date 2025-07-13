@@ -1,6 +1,8 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct NodeIdentifier(pub NodeIdentifier);
+use super::Identifier;
+
+pub struct NodeIdentifier(pub super::NodeIdentifier);
 
 impl super::Command for NodeIdentifier {
     fn identifier(&self) -> Identifier {

@@ -1,8 +1,19 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct BluetoothPower(pub BluetoothPower);
+use super::Identifier;
+
+pub enum BLEPower {
+    Power0 = 0, // -20 dBm
+    Power1 = 1, // -10 dBm
+    Power2 = 2, // 0 dBm
+    Power3 = 3, // 8 dBm
+}
+
+pub struct BluetoothPower(pub BLEPower);
 
 impl super::Command for BluetoothPower {
+    const PAYLOAD_SIZE: u8 = 0;
+
     fn identifier(&self) -> Identifier {
         Identifier::BluetoothPower
     }

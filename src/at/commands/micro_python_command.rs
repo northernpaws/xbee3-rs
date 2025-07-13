@@ -1,6 +1,24 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct MicroPythonCommand(pub MicroPythonCommand);
+use super::Identifier;
+
+pub enum MicroPythonCommand {
+    BundledCodeReport,
+    EraseBundledCode,
+    VersionReport,
+    InterruptProgram,
+}
+
+impl MicroPythonCommand {
+    pub fn command(&self) -> &'static str {
+        match self {
+            MicroPythonCommand::BundledCodeReport => "PYB",
+            MicroPythonCommand::EraseBundledCode => "PYE",
+            MicroPythonCommand::VersionReport => "PYV",
+            MicroPythonCommand::InterruptProgram => "PY^",
+        }
+    }
+}
 
 impl super::Command for MicroPythonCommand {
     fn identifier(&self) -> Identifier {

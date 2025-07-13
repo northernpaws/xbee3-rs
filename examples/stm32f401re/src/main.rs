@@ -125,7 +125,7 @@ async fn main(_spawner: Spawner) {
     }
     info!("broadcast sent!");
 
-    at::encode_command(at::commands::ACKFailures);
+    at::encode_command(at::commands::DIO0Configuration::Disabled);
 
     loop {}
 }

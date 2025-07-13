@@ -1,8 +1,12 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
+
+use super::Identifier;
 
 pub struct BluetoothMACAddress;
 
 impl super::Command for BluetoothMACAddress {
+    const PAYLOAD_SIZE: u8 = 0;
+    
     fn identifier(&self) -> Identifier {
         Identifier::BluetoothMACAddress
     }

@@ -1,6 +1,8 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct NetworkDiscover(pub Option<NodeIdentifier>);
+use super::Identifier;
+
+pub struct NetworkDiscover(pub Option<super::NodeIdentifier>);
 
 impl super::Command for NetworkDiscover {
     fn identifier(&self) -> Identifier {

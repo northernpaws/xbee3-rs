@@ -1,18 +1,27 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct DIO17Configuration(pub DIO17Configuration);
+use super::Identifier;
+
+pub enum DIO17Configuration {
+    Disabled = 0,
+    SPISSEL = 1,
+    DigitalOutputLow = 4,
+    DigitalOutputHigh = 5,
+}
 
 impl super::Command for DIO17Configuration {
+    const PAYLOAD_SIZE: u8 = 1;
+    
     fn identifier(&self) -> Identifier {
         Identifier::DIO17Configuration
     }
 }
 
-impl From<DIO17Configuration> for Command<0> {
-    fn from(cmd: DIO17Configuration) -> Command<0> {
+impl From<DIO17Configuration> for Command<1> {
+    fn from(cmd: DIO17Configuration) -> Command<1> {
         Command{
             identifier: Identifier::DIO17Configuration,
-            payload: None,
+            payload: Some(super::u8_ascii(cmd as u8)),
             carriage_returns: 1,
         }
     }

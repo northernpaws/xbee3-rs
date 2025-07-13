@@ -1,4 +1,6 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
+
+use super::Identifier;
 
 pub struct PacketizationTimeout(pub u8);
 

@@ -1,18 +1,30 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct DIO7Configuration(pub DIO7Configuration);
+use super::Identifier;
+
+pub enum DIO7Configuration {
+    Disabled = 0,
+    CTSFlowControl = 1,
+    DigitalInput = 3,
+    DigitalOutputLow = 4,
+    DigitalOutputHigh = 5,
+    RS485LowTx = 6,
+    RS485HighTx = 7,
+}
 
 impl super::Command for DIO7Configuration {
+    const PAYLOAD_SIZE: u8 = 1;
+    
     fn identifier(&self) -> Identifier {
         Identifier::DIO7Configuration
     }
 }
 
-impl From<DIO7Configuration> for Command<0> {
-    fn from(cmd: DIO7Configuration) -> Command<0> {
+impl From<DIO7Configuration> for Command<1> {
+    fn from(cmd: DIO7Configuration) -> Command<1> {
         Command{
             identifier: Identifier::DIO7Configuration,
-            payload: None,
+            payload: Some(super::u8_ascii(cmd as u8)),
             carriage_returns: 1,
         }
     }

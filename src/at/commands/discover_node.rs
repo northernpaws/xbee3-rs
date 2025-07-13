@@ -1,6 +1,8 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct DiscoverNode(pub NodeIdentifier);
+use super::Identifier;
+
+pub struct DiscoverNode(pub super::NodeIdentifier);
 
 impl super::Command for DiscoverNode {
     fn identifier(&self) -> Identifier {

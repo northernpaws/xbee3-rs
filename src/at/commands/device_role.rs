@@ -1,6 +1,13 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
 
-pub struct DeviceRole(pub DeviceRole);
+use super::Identifier;
+
+pub enum Role {
+    EndDevice = 0,
+    Coordinator = 1,
+}
+
+pub struct DeviceRole(pub Role);
 
 impl super::Command for DeviceRole {
     fn identifier(&self) -> Identifier {

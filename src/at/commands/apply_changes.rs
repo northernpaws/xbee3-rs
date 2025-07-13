@@ -1,8 +1,12 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
+
+use super::Identifier;
 
 pub struct ApplyChanges;
 
 impl super::Command for ApplyChanges {
+    const PAYLOAD_SIZE: u8 = 0;
+
     fn identifier(&self) -> Identifier {
         Identifier::ApplyChanges
     }

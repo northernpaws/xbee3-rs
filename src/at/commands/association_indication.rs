@@ -1,18 +1,22 @@
-use crate::at::{Command, Identifier};
+use crate::at::Command;
+
+use super::Identifier;
 
 pub struct AssociationIndication(pub u8);
 
 impl super::Command for AssociationIndication {
+    const PAYLOAD_SIZE: u8 = 1;
+    
     fn identifier(&self) -> Identifier {
         Identifier::AssociationIndication
     }
 }
 
-impl From<AssociationIndication> for Command<0> {
-    fn from(cmd: AssociationIndication) -> Command<0> {
+impl From<AssociationIndication> for Command<1> {
+    fn from(cmd: AssociationIndication) -> Command<1> {
         Command{
             identifier: Identifier::AssociationIndication,
-            payload: None,
+            payload: Some([cmd.0]),
             carriage_returns: 1,
         }
     }
