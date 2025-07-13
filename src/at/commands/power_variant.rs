@@ -1,21 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct PowerVariant;
-
-impl super::Command for PowerVariant {
-    fn identifier(&self) -> Identifier {
-        Identifier::PowerVariant
-    }
-}
-
-impl From<PowerVariant> for Command<0> {
-    fn from(cmd: PowerVariant) -> Command<0> {
-        Command{
-            identifier: Identifier::PowerVariant,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

@@ -1,21 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct ForcePoll;
-
-impl super::Command for ForcePoll {
-    fn identifier(&self) -> Identifier {
-        Identifier::ForcePoll
-    }
-}
-
-impl From<ForcePoll> for Command<0> {
-    fn from(cmd: ForcePoll) -> Command<0> {
-        Command{
-            identifier: Identifier::ForcePoll,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

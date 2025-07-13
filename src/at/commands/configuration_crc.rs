@@ -1,23 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct ConfigurationCRC;
-
-impl super::Command for ConfigurationCRC {
-    const PAYLOAD_SIZE: u8 = 0;
-
-    fn identifier(&self) -> Identifier {
-        Identifier::ConfigurationCRC
-    }
-}
-
-impl From<ConfigurationCRC> for Command<0> {
-    fn from(cmd: ConfigurationCRC) -> Command<0> {
-        Command{
-            identifier: Identifier::ConfigurationCRC,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

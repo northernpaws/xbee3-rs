@@ -1,21 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct RestoreDefaults;
-
-impl super::Command for RestoreDefaults {
-    fn identifier(&self) -> Identifier {
-        Identifier::RestoreDefaults
-    }
-}
-
-impl From<RestoreDefaults> for Command<0> {
-    fn from(cmd: RestoreDefaults) -> Command<0> {
-        Command{
-            identifier: Identifier::RestoreDefaults,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

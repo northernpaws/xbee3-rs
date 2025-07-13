@@ -1,21 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct Write;
-
-impl super::Command for Write {
-    fn identifier(&self) -> Identifier {
-        Identifier::Write
-    }
-}
-
-impl From<Write> for Command<0> {
-    fn from(cmd: Write) -> Command<0> {
-        Command{
-            identifier: Identifier::Write,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

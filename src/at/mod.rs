@@ -9,3 +9,4 @@ pub struct Command<const N: usize> {
 pub fn encode_command<const N: usize, C: Into<Command<N>>> (cmd: C) {
 
 }
+

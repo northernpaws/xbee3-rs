@@ -432,10 +432,7 @@ impl Identifier {
 }
 
 
-pub trait Command<const PAYLOAD_SIZE: usize> {
-    /// Defines the size of the command parameter payload in bytes.
-    const PAYLOAD_SIZE: usize = PAYLOAD_SIZE;
-
+pub trait Command {
     fn identifier(&self) -> Identifier;
 
     fn carriage_returns (&self) -> u8 {
@@ -443,29 +440,34 @@ pub trait Command<const PAYLOAD_SIZE: usize> {
     }
 }
 
-pub trait CommandWithPayload<const PAYLOAD_SIZE: usize>: Command<PAYLOAD_SIZE> {
-    fn payload() -> [u8; PAYLOAD_SIZE];
+// impl<C: Command> From<C> for super::Command<0> {
+//     fn from(cmd: C) -> super::Command<0> {
+//         super::Command{
+//             identifier: cmd.identifier(),
+//             payload: None,
+//             carriage_returns: cmd.carriage_returns(),
+//         }
+//     }
+// }
+
+pub trait CommandWithPayload<const P: usize> {
+    /// Defines the size of the command parameter payload in bytes.
+    const PAYLOAD_SIZE: usize = P;
+
+    fn payload(&self) -> [u8; P];
 }
 
-impl<const PAYLOAD_SIZE: usize, C: Command<PAYLOAD_SIZE>> From<C> for super::Command<PAYLOAD_SIZE> {
-    fn from(cmd: C) -> super::Command<PAYLOAD_SIZE> {
-        super::Command{
-            identifier: cmd.identifier(),
-            payload: None,
-            carriage_returns: cmd.carriage_returns(),
-        }
-    }
-}
+// impl<const P: usize, C: CommandWithPayload<P>> From<C> for super::Command<P> {
+//     fn from(cmd: C) -> super::Command<P> {
+//         assert!(P > 0, "P must be greater than 0");
 
-impl<const PAYLOAD_SIZE: usize, C: Command<PAYLOAD_SIZE>> From<C> for super::Command<PAYLOAD_SIZE> {
-    fn from(cmd: C) -> super::Command<PAYLOAD_SIZE> {
-        super::Command{
-            identifier: cmd.identifier(),
-            payload: None,
-            carriage_returns: cmd.carriage_returns(),
-        }
-    }
-}
+//         super::Command{
+//             identifier: cmd.identifier(),
+//             payload: Some(cmd.payload()),
+//             carriage_returns: cmd.carriage_returns(),
+//         }
+//     }
+// }
 
 mod operating_channel;
 pub use operating_channel::*;

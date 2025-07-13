@@ -1,23 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct ApplyChanges;
-
-impl super::Command for ApplyChanges {
-    const PAYLOAD_SIZE: u8 = 0;
-
-    fn identifier(&self) -> Identifier {
-        Identifier::ApplyChanges
-    }
-}
-
-impl From<ApplyChanges> for Command<0> {
-    fn from(cmd: ApplyChanges) -> Command<0> {
-        Command{
-            identifier: Identifier::ApplyChanges,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}

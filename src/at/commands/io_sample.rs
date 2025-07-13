@@ -1,21 +1,4 @@
-use crate::at::Command;
+use xbee3_rs_macros::Command;
 
-use super::Identifier;
-
+#[derive(Command)]
 pub struct IOSample;
-
-impl super::Command for IOSample {
-    fn identifier(&self) -> Identifier {
-        Identifier::IOSample
-    }
-}
-
-impl From<IOSample> for Command<0> {
-    fn from(cmd: IOSample) -> Command<0> {
-        Command{
-            identifier: Identifier::IOSample,
-            payload: None,
-            carriage_returns: 1,
-        }
-    }
-}
