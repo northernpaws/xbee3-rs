@@ -1,4 +1,4 @@
-use xbee3_rs_macros::Command;
+use xbee3_rs_macros::command;
 
-#[derive(Command(payload_size = 2))]
+#[command]
 pub struct ACKFailures(pub u16);

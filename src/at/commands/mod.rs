@@ -1,22 +1,4 @@
 
-/// Converts from a u8 to it's ASCII representaion.
-pub(crate) fn u8_ascii(num: u8) -> [u8; 1] {
-    if num > 9 {
-        panic!("u8_ascii is not valid for uints bigger then 9");
-    }
-
-    return [30+num];
-}
-
-pub(crate) fn bool_ascii(val: bool) -> [u8;1] {
-    match val {
-        true => u8_ascii(1),
-        false => u8_ascii(0),
-    }
-}
-
-
-
 pub type NodeIdentifier = [u8; 20];
 
 /// Enum of all the valid AT command identifiers for the XBee 3 802.15.4 modules.
@@ -468,6 +450,53 @@ pub trait CommandWithPayload<const P: usize> {
 //         }
 //     }
 // }
+
+
+/// Converts from a u8 to it's ASCII representaion.
+pub(crate) fn u8_ascii(num: u8) -> [u8; 3] {
+    if num <= 9 {
+        // Shortcut for single digits
+        return [48+num, 0, 0];
+    }
+
+    let mut chars  = [0u8; 3];
+    let mut n = num;
+    let mut i = 3;
+    while n > 0 {
+        chars[i] = 48 + ((n & 0xFF) as u8); // extract least significant byte
+        n >>= 8;
+        i -=1 ;
+    }
+    // bytes.reverse(); // big-endian
+
+    chars
+}
+
+pub(crate) fn bool_ascii(val: bool) -> [u8;1] {
+    match val {
+        true => [49],
+        false => [48],
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_bool_ascii() {
+        assert_eq!(bool_ascii(false), [48]);
+        assert_eq!(bool_ascii(true), [49]);
+    }
+
+    #[test]
+    fn test_u8_ascii() {
+        assert_eq!(u8_ascii(0), [48, 0, 0]);
+        assert_eq!(u8_ascii(1), [49, 0, 0]);
+        assert_eq!(u8_ascii(10), [49, 48, 0]);
+    }
+
+}
 
 mod operating_channel;
 pub use operating_channel::*;
